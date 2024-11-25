@@ -1,0 +1,169 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+typedef struct _STACK_NODE_T
+{
+    struct TreeNode *data;
+    struct _STACK_NODE_T *pNext;
+} STACK_NODE, *PSTACK_NODE;
+
+typedef struct _STACK_T
+{
+    PSTACK_NODE pHead;
+    int size;
+} STACK, *PSTACK;
+
+
+
+PSTACK createStack()
+{
+    PSTACK pSt = (PSTACK)malloc(sizeof(STACK));
+    if(pSt == NULL)
+    {
+        return NULL;
+    }
+    
+    pSt->pHead = NULL;
+    pSt->size = 0;
+
+    return pSt;
+}
+
+void push(PSTACK pSt, struct TreeNode *p)
+{
+    PSTACK_NODE pNode = (PSTACK_NODE)malloc(sizeof(STACK_NODE));
+    if(pNode == NULL)
+    {
+        return ;
+    }
+
+    pNode->data = p;
+    pNode->pNext = pSt->pHead;
+
+    pSt->pHead = pNode;
+    pSt->size++;
+}
+
+int size(PSTACK pSt)
+{
+    return pSt->size;
+}
+
+struct TreeNode* top(PSTACK pSt)
+{
+    if(size(pSt) > 0)
+    {
+        return pSt->pHead->data;
+    }
+
+    return '\0';
+}
+
+struct TreeNode* pop(PSTACK pSt)
+{
+    if(size(pSt) > 0)
+    {
+        struct TreeNode* ans = pSt->pHead->data;
+        PSTACK_NODE pToFree = pSt->pHead;
+
+        pSt->pHead = pSt->pHead->pNext;
+        pSt->size--;
+
+        free(pToFree);
+
+        return ans;
+    }
+
+    return '\0';
+}
+
+void destroyStack(PSTACK pSt)
+{
+    if(pSt != NULL)
+    {
+        while(size(pSt) > 0)
+        {
+            pop(pSt);
+        }
+
+        free(pSt);
+    }
+}
+
+
+
+
+
+typedef struct {
+    PSTACK pSt;
+} BSTIterator;
+
+
+BSTIterator* bSTIteratorCreate(struct TreeNode* root)
+{
+    BSTIterator *pIt = (BSTIterator*)malloc(sizeof(BSTIterator));
+
+    pIt->pSt = createStack();
+
+    // push all left side of root
+    struct TreeNode *pLeftSide = root;
+
+    while(pLeftSide != NULL)
+    {
+        push(pIt->pSt, pLeftSide);
+        pLeftSide = pLeftSide->left;
+    }
+
+    return pIt;
+}
+
+int bSTIteratorNext(BSTIterator* obj)
+{
+    struct TreeNode *pCurr = pop(obj->pSt);
+    struct TreeNode *pR = pCurr->right;
+
+    while(pR != NULL)
+    {
+        push(obj->pSt, pR);
+        pR = pR->left;
+    }
+
+    return pCurr->val;
+}
+
+bool bSTIteratorHasNext(BSTIterator* obj) {
+
+    if(size(obj->pSt) == 0)
+    {
+        return false;
+    }
+
+    //if((size(obj->pSt) == 1) && (top(obj->pSt)->right == NULL))
+    //{
+    //    return false;
+    //}
+
+    return true;
+}
+
+void bSTIteratorFree(BSTIterator* obj)
+{
+    destroyStack(obj->pSt);
+    free(obj);
+}
+
+/**
+ * Your BSTIterator struct will be instantiated and called as such:
+ * BSTIterator* obj = bSTIteratorCreate(root);
+ * int param_1 = bSTIteratorNext(obj);
+ 
+ * bool param_2 = bSTIteratorHasNext(obj);
+ 
+ * bSTIteratorFree(obj);
+*/
