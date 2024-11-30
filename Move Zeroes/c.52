@@ -1,0 +1,26 @@
+void moveZeroes(int* nums, int numsSize)
+{
+    if (numsSize == 1)
+        return;
+    
+    int firstZero = -1, next = 0;
+    
+    while (next < numsSize)
+    {
+        // If you found a nonzero and there is a zero before it, swap the two
+        if (firstZero >= 0 && nums[next])
+        {
+            // swap the two
+            nums[firstZero] = nums[next];
+            nums[next] = 0;
+            firstZero++;
+        }
+        // If you found a zero and it is your first zero, save the spot
+        else if (firstZero == -1 && !nums[next])
+        {
+            firstZero = next;
+        }
+        
+        next++;
+    }
+}
