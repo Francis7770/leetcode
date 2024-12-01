@@ -1,0 +1,83 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+ #define MAX_NODES 10000
+
+void traversal(struct TreeNode * node, int * mode, int * prev_unique_element, int * ret_arr, int * ret_arr_index, int * max_mode, struct TreeNode * root)
+{
+    if(node)
+    {
+        traversal(node->left, mode, prev_unique_element, ret_arr, ret_arr_index, max_mode, root);
+
+        if(*prev_unique_element == INT_MIN)
+        {
+            *prev_unique_element = node->val;
+            *mode += 1;
+        }
+        else if(*prev_unique_element == node->val)
+        {
+            *mode += 1;
+        }
+        else if(*prev_unique_element != node->val)
+        {
+            //Capture the previous mode if its greater than max_mode
+            if(*mode > *max_mode)
+            {
+                *max_mode = *mode;
+                *ret_arr_index = 0;
+                ret_arr[*ret_arr_index] = *prev_unique_element;
+                *ret_arr_index += 1;
+            }
+            else if(*mode == *max_mode)
+            {
+                ret_arr[*ret_arr_index] = *prev_unique_element;
+                *ret_arr_index += 1;
+            }
+
+            //Reset mode and prev unique element
+            *mode = 1;
+            *prev_unique_element = node->val;
+        }
+
+        traversal(node->right, mode, prev_unique_element, ret_arr, ret_arr_index, max_mode, root);
+
+        if(root == node)
+        {
+            if(*mode > *max_mode)
+            {
+                *max_mode = *mode;
+                *ret_arr_index = 0;
+                ret_arr[*ret_arr_index] = *prev_unique_element;
+                *ret_arr_index += 1;
+            }
+            else if(*mode == *max_mode)
+            {
+                ret_arr[*ret_arr_index] = *prev_unique_element;
+                *ret_arr_index += 1;
+            }
+        }
+    }
+    return;
+}
+
+int* findMode(struct TreeNode* root, int* returnSize) 
+{
+    int mode = 0;
+    int max_mode = 0;
+    int prev_unique_element = INT_MIN;
+
+    int * ret_arr = (int *)malloc(sizeof(int) * MAX_NODES);
+    int ret_arr_index = 0;
+
+    traversal(root, &mode, &prev_unique_element, ret_arr, &ret_arr_index, &max_mode, root);
+    *returnSize = ret_arr_index;
+    return ret_arr;
+}
