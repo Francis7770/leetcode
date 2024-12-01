@@ -1,0 +1,57 @@
+/*
+ * 504. Base 7
+ *
+ * Given an integer num, return a string of its base 7 representation.
+ *
+ * -10^7 <= num <= 10^7
+ */
+
+char ans[16];
+
+char* convertToBase7(int num) {
+
+    /*
+     * Input:
+     *  num
+     */
+
+    int len = 0, start = 0;
+
+    /* Special confition: num equals 0 */
+    if (num == 0) {
+        ans[0] = '0';
+        ans[1] = 0;
+    }
+    else {
+        /* Negtive value */
+        if (num < 0) {
+            ans[len] = '-';
+            start = 1;
+            len++;
+        }
+
+        num = abs(num);
+
+        /* Calculate the digits and store the ASCII */
+        for (; num; num /= 7) {
+            ans[len] = (char)(num % 7) + '0';
+            len++;
+        }
+
+        ans[len] = 0;
+
+        /* Reverse the ASCII */
+        for (int j = len - 1; start < j; start++, j--) {
+            char tmp = ans[start];
+            ans[start] = ans[j];
+            ans[j] = tmp;
+        }
+    }
+
+    /*
+     * Output:
+     *  return a string of its base 7 representation.
+     */
+
+    return ans;
+}
